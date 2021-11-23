@@ -35,11 +35,11 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@router.post("/api/create/post", status_code=201, response_model=Game)
-async def create_post(item: Game, current_user: User = Depends(get_current_user)):
+@router.post("/api/create/game", status_code=201, response_model=Game)
+async def create_game(item: Game, current_user: User = Depends(get_current_user)):
     return await item.save()
 
 
-@router.get("/api/get/all/post")
+@router.get("/api/get/all/game")
 async def get_all():
     return await Game.find_all().to_list()
