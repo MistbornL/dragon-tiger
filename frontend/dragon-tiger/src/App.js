@@ -5,7 +5,14 @@ function App() {
   const socket = useRef(null);
   const [response, setResponse] = useState("");
   useEffect(() => {
-    socket.current = io("http://localhost:8000");
+    socket.current = io("http://localhost:8000", {
+      transports: ["websocket"],
+      path: "/sub/socket.io",
+    });
+    socket.current.on("connect", (data) => {
+      console.log(data);
+    });
+    socket.current.emit(("send_message", { message: "hoi" }));
   }, []);
 
   return (

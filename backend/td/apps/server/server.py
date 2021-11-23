@@ -3,7 +3,7 @@ import socketio
 static_files = {
     '/': './public',
 }
-sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins="*", static_files=static_files)
+sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins=[], static_files=static_files)
 app = socketio.ASGIApp(sio)
 
 
