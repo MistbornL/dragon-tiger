@@ -8,7 +8,7 @@ from beanie import init_beanie
 from .config import settings
 from td.apps.documents.document import Round, User, Game, GamePlayer
 from td.apps.routers.game import router
-from td.apps.server.server import sio, app
+from td.apps.server.server import sio, s_app
 
 
 def create_app() -> FastAPI:
@@ -23,7 +23,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"]
     )
 
-    app.mount("/sub", app)
+    app.mount("/ws", s_app)
 
     @app.on_event("startup")
     async def startup_event():

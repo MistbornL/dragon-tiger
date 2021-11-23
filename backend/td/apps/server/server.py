@@ -4,11 +4,11 @@ static_files = {
     '/': './public',
 }
 sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins=[], static_files=static_files)
-app = socketio.ASGIApp(sio)
+s_app = socketio.ASGIApp(sio)
 
 
 @sio.event
-def connect(sid, environ, auth):
+def connect(sid, environ):
     print('connect ', sid)
 
 

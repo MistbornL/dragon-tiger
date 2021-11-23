@@ -4,13 +4,14 @@ import io from "socket.io-client";
 function App() {
   const socket = useRef(null);
   const [response, setResponse] = useState("");
+
   useEffect(() => {
     socket.current = io("http://localhost:8000", {
       transports: ["websocket"],
-      path: "/sub/socket.io",
+      path: "/ws/socket.io",
     });
     socket.current.on("connect", (data) => {
-      console.log(data);
+      setResponse(data);
     });
     socket.current.emit(("send_message", { message: "hoi" }));
   }, []);
