@@ -10,12 +10,7 @@ function App() {
       transports: ["websocket"],
       path: "/ws/socket.io",
     });
-    socket.current.on("connect", (data) => {
-      setResponse(data);
-    });
-    socket.current.emit(("send_message", { message: "hoi" }));
   }, []);
-
   return (
     <div className="App">
       <h1>Welcome</h1>

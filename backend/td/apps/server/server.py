@@ -3,13 +3,14 @@ import socketio
 static_files = {
     '/': './public',
 }
-sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins=[], static_files=static_files)
+sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins=[])
 s_app = socketio.ASGIApp(sio)
 
 
 @sio.event
-def connect(sid, environ):
+async def connect(sid, environ):
     print('connect ', sid)
+    await sio.emit("message", {"message": "asd"})
 
 
 @sio.event

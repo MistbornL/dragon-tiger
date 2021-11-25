@@ -1,14 +1,18 @@
 from datetime import timedelta
+from typing import List
 
 from fastapi import APIRouter, HTTPException, Depends, status
 
 from fastapi.security import OAuth2PasswordRequestForm
 
-from td.apps.documents.document import Game, User
+from td.apps.documents.document import Game, User, Round, GamePlayer
 from td.apps.auth.auth import authenticate_user, create_access_token, get_password_hash, get_current_user
 from td.config import settings
 from td.apps.models.models import Token
-
+from td.apps.server.server import sio
+import time
+from td.apps.routers.service.generate import generate_deck
+from td.apps.routers.service.shuffle import shuffle_cars
 
 router = APIRouter(prefix="")
 
@@ -37,9 +41,39 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
 @router.post("/api/create/game", status_code=201, response_model=Game)
 async def create_game(item: Game, current_user: User = Depends(get_current_user)):
+    deck = []
+    forms = ['D', 'S', 'C', 'H']
+    numbers = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+    generate_deck(deck, forms, numbers)
+    deck = deck * 8
+    shuffle_cars(deck)
+    for card in deck:
+        item.deck.append(card)
+    item.deck.pop(0)
     return await item.save()
 
 
 @router.get("/api/get/all/game")
 async def get_all():
     return await Game.find_all().to_list()
+
+
+@router.delete("/api/delete/all/game")
+async def delete_all():
+    return await Game.delete_all()
+
+
+@router.post("/api/create/round", status_code=201)
+async def get_all(item: Round):
+    dragon_card, tiger_card = [], []
+    return await item.save()
+
+
+@router.get("/api/get/all/round")
+async def get_all():
+    return await Round.find_all().to_list()
+
+
+@router.delete("/api/delete/all/round")
+async def delete_all():
+    return await Round.delete_all()

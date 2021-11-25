@@ -14,6 +14,7 @@ from td.apps.server.server import sio, s_app
 def create_app() -> FastAPI:
     app = FastAPI()
 
+    app.mount("/ws", s_app)
     app.include_router(router)
     app.add_middleware(
         CORSMiddleware,
@@ -22,8 +23,6 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"]
     )
-
-    app.mount("/ws", s_app)
 
     @app.on_event("startup")
     async def startup_event():

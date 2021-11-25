@@ -1,10 +1,11 @@
-from typing import Optional
+from typing import Optional, List
 
 from beanie import Document
 
 
 class Game(Document):
     name: str
+    deck: Optional[List]
     minBet: Optional[int] = 5
     maxBet: Optional[int] = 10000
 
