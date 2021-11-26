@@ -5,18 +5,18 @@ from beanie import Document
 
 class Game(Document):
     name: str
-    deck: Optional[List]
     minBet: Optional[int] = 5
     maxBet: Optional[int] = 10000
 
 
 class Round(Document):
-    end_time: int
-    dragon_card: str
-    tiger_card: str
-    winner: str
-    card_counted: int
-    finished: bool
+    end_time: int = 123123
+    game_id: str
+    dragon_card: str = None
+    tiger_card: str = None
+    winner: str = None
+    card_count: int = 0
+    finished: bool = False
 
 
 class GamePlayer(Document):

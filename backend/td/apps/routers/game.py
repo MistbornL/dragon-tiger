@@ -40,16 +40,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
 
 @router.post("/api/create/game", status_code=201, response_model=Game)
-async def create_game(item: Game, current_user: User = Depends(get_current_user)):
-    deck = []
-    forms = ['D', 'S', 'C', 'H']
-    numbers = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
-    generate_deck(deck, forms, numbers)
-    deck = deck * 8
-    shuffle_cars(deck)
-    for card in deck:
-        item.deck.append(card)
-    item.deck.pop(0)
+async def create_game(item: Game):
     return await item.save()
 
 
