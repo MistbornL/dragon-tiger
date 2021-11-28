@@ -3,7 +3,7 @@ import socketio
 
 
 sio = socketio.AsyncClient()
-game_id = "61a0d8deb9ff41b57231fda0"
+game_id = "61a399db449845d95931b6bb"
 
 
 game_round_id = None

@@ -14,9 +14,7 @@ s_app = socketio.ASGIApp(sio)
 
 @sio.event
 async def connect(sid, environ):
-    print(environ)
-    # game_id = parse_qs(environ['QUERY_STRING']).get("game_id")[0]
-    game_id = "61a0d8deb9ff41b57231fda0"
+    game_id = parse_qs(environ['QUERY_STRING']).get("game_id")[0]
     game = await Game.get(PydanticObjectId(game_id))
     game_round = await get_or_create_game_round(game_id)
     send_data = {
