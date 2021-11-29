@@ -14,8 +14,8 @@ from td.apps.server.server import sio, s_app
 def create_app() -> FastAPI:
     app = FastAPI()
 
-    app.mount("/ws", s_app)
     app.include_router(router)
+    app.mount("/ws", s_app)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
