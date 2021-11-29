@@ -41,4 +41,5 @@ const Home = () => {
 };
 
 // vso magia dalshe uberet kitxvebis shemtxvevashi momweret imedia gipasuxebt mara didi imedi mainc nu geqnebat mainc ravici :DDDDDDDDDD he shecxet axla
+//  tu eseti ragac amoagdo Attempted import error: 'useParams' is not exported from 'react-router'. mashin daweret npm i react-router-dom
 export default Home;
