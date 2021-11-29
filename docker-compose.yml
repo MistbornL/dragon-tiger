@@ -16,6 +16,8 @@ services:
     image: mongo:5.0.3
     ports:
       - "27017:27017"
+    logging:
+      driver: none
     volumes:
       - mongodb_volume:/data/db
 

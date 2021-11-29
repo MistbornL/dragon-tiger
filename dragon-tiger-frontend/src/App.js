@@ -9,18 +9,6 @@ import Game from "./Game";
 import route_history from "./router_history";
 
 function App() {
-  const socket = useRef(null);
-  const [response, setResponse] = useState("");
-
-  const clickHandle = () => {};
-
-  useEffect(() => {
-    socket.current = io("http://localhost:8000", {
-      transports: ["websocket"],
-      path: "/ws/socket.io",
-      query:{'game_id': 12312313}
-    });
-  }, []);
 
   return (
       <Router history={route_history} >
