@@ -8,9 +8,12 @@ const Table = ({
   handleChangeBet,
   bet,
   sendBet,
+  handleChangeTarget,
+  target,
+  sendTarget,
 }) => {
   return (
-    <div className="container">
+    <div className="cr">
       <div className="table">
         <h1>welcome to the table</h1>
         <p>min_bet: {gameSpec.min_bet || ""}</p>
@@ -24,6 +27,16 @@ const Table = ({
             aria-describedby="inputGroup-sizing-sm"
             onChange={handleChangeBet}
             value={bet}
+          />
+          <br />
+          <input
+            placeholder="place bets on dragon/tiger..."
+            type="text"
+            class="form-control"
+            aria-label="Sizing example input"
+            aria-describedby="inputGroup-sizing-sm"
+            onChange={handleChangeTarget}
+            value={target}
           />
           <br />
           <input

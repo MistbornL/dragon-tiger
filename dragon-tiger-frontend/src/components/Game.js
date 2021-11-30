@@ -7,16 +7,21 @@ const Game = () => {
   const { id } = useParams();
   const [gameSpec, setGameSpec] = useState({});
   const [card, setCard] = useState("");
-  const [bet, setBet] = useState(null);
+  const [bet, setBet] = useState("");
+  const [target, setTarget] = useState("");
 
   const socket = useRef(null);
 
   const handleChange = (e) => {
     setCard(e.target.value);
   };
-  console.log(card);
+
   const handleChangeBet = (e) => {
     setBet(e.target.value);
+  };
+
+  const handleChangeTarget = (e) => {
+    setTarget(e.target.value);
   };
 
   useEffect(() => {
@@ -48,6 +53,13 @@ const Game = () => {
     });
   };
 
+  const sendTarget = (e) => {
+    e.preventDefault();
+    socket.current.emit("receive_target", {
+      target: target,
+    });
+  };
+
   return (
     <div>
       <Table
@@ -58,6 +70,9 @@ const Game = () => {
         handleChange={handleChange}
         handleChangeBet={handleChangeBet}
         bet={bet}
+        handleChangeTarget={handleChangeTarget}
+        target={target}
+        sendTarget={sendTarget}
       />
     </div>
   );

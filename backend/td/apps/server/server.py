@@ -1,6 +1,6 @@
 import socketio
 from urllib.parse import parse_qs
-from td.apps.documents.document import Game
+from td.apps.documents.document import Game, Round
 from beanie import PydanticObjectId
 from .quieries import get_or_create_game_round
 
@@ -26,15 +26,41 @@ async def connect(sid, environ):
 
 
 @sio.event
-async def scan_card(sid, data):
+async def scan_card(sid, environ, data):
     card = data.get('card')
     await sio.emit("sdasd", data)
+
+    game_id = parse_qs(environ['QUERY_STRING']).get("game_id")[0]
+    round = await Round.get(PydanticObjectId(game_id))
+    dragon_card = round.dragon_card
+    tiger_card = round.tiger_card
+    cc = round.card_count
+    if cc == 0:
+        tiger_card == card
+        cc += 1
+    else:
+        dragon_card = card
+    await round.save()
+    if dragon_card[1:] > tiger_card[1:]:
+        round.winner == dragon_card
+    elif dragon_card[1:] < tiger_card[1:]:
+        round.winner == tiger_card
+    else:
+        round.winner = "tie"
+    await round.save()
 
 
 @sio.event
 async def receive_bet(sid, data):
     bet = data.get('bet')
     await sio.emit("sdasd", data)
+
+
+@sio.event
+async def receive_target(sid, data):
+    target = data.get('target')
+    await sio.emit("sdasd", data)
+
 
 @sio.event
 async def disconnect(sid):

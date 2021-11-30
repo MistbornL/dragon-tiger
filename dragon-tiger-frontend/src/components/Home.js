@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
+import "./index.css";
 const Home = () => {
   const [games, setGames] = useState([]);
 
@@ -12,26 +12,23 @@ const Home = () => {
   useEffect(() => {
     getGames();
   }, []);
-
+  console.log(games);
   const renderGames = () => {
     return games.map((game) => {
       return (
-        <div>
-          <h1>{game.name}</h1>
-          <h2>{game._id}</h2>
+        <section>
+          <p>Table Name: {game.name}</p>
+          <p>Min bet on this table: {game.minBet}</p>
 
-          <a href={`http://localhost:3000/game/${game._id}`}>GADAVEDIT </a>
-        </div>
+          <a href={`http://localhost:3000/game/${game._id}`}>{game._id}</a>
+        </section>
       );
     });
   };
 
   return (
-    <div>
-      <h1>
-        Home
-        {renderGames()}
-      </h1>
+    <div className="container">
+      <div className="tb">{renderGames()}</div>
     </div>
   );
 };
