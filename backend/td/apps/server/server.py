@@ -22,15 +22,19 @@ async def connect(sid, environ):
     }
     sio.enter_room(sid, game_id)
     await sio.emit("on_connect_data", send_data, to=sid)
-    print("sadasdsdda")
+    print("im connected")
 
 
 @sio.event
 async def scan_card(sid, data):
     card = data.get('card')
-    print(data)
     await sio.emit("sdasd", data)
 
+
+@sio.event
+async def receive_bet(sid, data):
+    bet = data.get('bet')
+    await sio.emit("sdasd", data)
 
 @sio.event
 async def disconnect(sid):
