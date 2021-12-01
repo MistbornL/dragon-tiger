@@ -9,6 +9,8 @@ const Game = () => {
   const [card, setCard] = useState("");
   const [bet, setBet] = useState("");
   const [target, setTarget] = useState("");
+  const [dragonCard, setDragonCard] = useState("")
+  const [tigerCard, setTigerCard] = useState("")
 
   const socket = useRef(null);
 
@@ -38,12 +40,25 @@ const Game = () => {
     });
   }, []);
 
+  useEffect(() => {
+    socket.current.on("send_dragon_card", (data) => {
+      setDragonCard(data.card)
+    })
+  }, [])
+
+
+  useEffect(() => {
+    socket.current.on("send_tiger_card", (data) => {
+      setTigerCard(data.card)
+    })
+  }, [])
+
   const sendCard = (e) => {
     e.preventDefault();
     socket.current.emit("scan_card", {
       card: card,
+      game_round_id: gameSpec.game_round_id
     });
-    console.log(card);
   };
 
   const sendBet = (e) => {
@@ -73,6 +88,10 @@ const Game = () => {
         handleChangeTarget={handleChangeTarget}
         target={target}
         sendTarget={sendTarget}
+        dragonCard={dragonCard}
+        tigerCard={tigerCard}
+        socket={socket}
+        start_timestamp={gameSpec.start_timestamp}
       />
     </div>
   );

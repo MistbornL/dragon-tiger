@@ -10,7 +10,6 @@ s_app = socketio.ASGIApp(sio)
 
 @sio.event
 async def connect(sid, environ):
-    print(environ)
     game_id = parse_qs(environ['QUERY_STRING']).get("game_id")[0]
     game = await Game.get(PydanticObjectId(game_id))
     game_round = await get_or_create_game_round(game_id)
@@ -18,7 +17,8 @@ async def connect(sid, environ):
         "min_bet": game.minBet,
         "max_bet": game.maxBet,
         "name": game.name,
-        "game_round_id": str(game_round.id)
+        "game_round_id": str(game_round.id),
+        "start_timestamp": 15
     }
     sio.enter_room(sid, game_id)
     await sio.emit("on_connect_data", send_data, to=sid)
@@ -26,28 +26,21 @@ async def connect(sid, environ):
 
 
 @sio.event
-async def scan_card(sid, environ, data):
-    card = data.get('card')
-    await sio.emit("sdasd", data)
-
-    game_id = parse_qs(environ['QUERY_STRING']).get("game_id")[0]
-    round = await Round.get(PydanticObjectId(game_id))
-    dragon_card = round.dragon_card
-    tiger_card = round.tiger_card
-    cc = round.card_count
-    if cc == 0:
-        tiger_card == card
-        cc += 1
+async def scan_card(sid, data):
+    print(data)
+    game_round = await Round.get(PydanticObjectId(data['game_round_id']))
+    card = data['card']
+    if game_round.card_count:
+        game_round.dragon_card = card
+        game_round.card_count += 1
+        await game_round.save()
+        await sio.emit("send_dragon_card", {"card": card}, room=game_round.game_id)
     else:
-        dragon_card = card
-    await round.save()
-    if dragon_card[1:] > tiger_card[1:]:
-        round.winner == dragon_card
-    elif dragon_card[1:] < tiger_card[1:]:
-        round.winner == tiger_card
-    else:
-        round.winner = "tie"
-    await round.save()
+        game_round.tiger_card = card
+        game_round.card_count += 1
+        await game_round.save()
+        await sio.emit("send_tiger_card", {"card": card}, room=game_round.game_id)
+    print(game_round)
 
 
 @sio.event
