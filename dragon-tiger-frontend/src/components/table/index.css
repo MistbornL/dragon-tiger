@@ -19,3 +19,7 @@
   top: 5px;
   right: 10px;
 }
+
+.table > :not(:first-child) {
+  border-top: none;
+}

@@ -20,12 +20,12 @@ class Round(Document):
 
 
 class GamePlayer(Document):
-    game_round: int
-    total_bet: int
-    dragon_bet: int
-    tiger_bet: int
-    tie_bet: int
-    deposit: int
+    game_round: Optional[int]
+    total_bet: int = 0
+    dragon_bet: int = 0
+    tiger_bet: int = 0
+    tie_bet: int = 0
+    deposit: int = 500
 
 
 class User(Document):

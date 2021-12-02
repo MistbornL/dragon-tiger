@@ -1,6 +1,6 @@
 import socketio
 from urllib.parse import parse_qs
-from td.apps.documents.document import Game, Round
+from td.apps.documents.document import Game, Round, GamePlayer
 from beanie import PydanticObjectId
 from .quieries import get_or_create_game_round
 
@@ -30,7 +30,7 @@ async def scan_card(sid, data):
     print(data)
     game_round = await Round.get(PydanticObjectId(data['game_round_id']))
     card = data['card']
-    if game_round.card_count:
+    if game_round.card_count % 2 == 0:
         game_round.dragon_card = card
         game_round.card_count += 1
         await game_round.save()
@@ -40,19 +40,73 @@ async def scan_card(sid, data):
         game_round.card_count += 1
         await game_round.save()
         await sio.emit("send_tiger_card", {"card": card}, room=game_round.game_id)
-    print(game_round)
+
+    dragon_card = game_round.dragon_card
+    tiger_card = game_round.tiger_card
+    dragon = ""
+    tiger = ""
+    try:
+        for dragoncard in dragon_card:
+            if dragoncard.isdigit():
+                dragon += str(dragoncard)
+
+        for tigercard in tiger_card:
+            if tigercard.isdigit():
+                tiger += str(tigercard)
+
+        dragon = int(dragon)
+        tiger = int(tiger)
+    except TypeError:
+        print("waiting for second card")
+    except ValueError:
+        print("waiting for second card")
+
+    if dragon > tiger:
+        game_round.winner = "dragon"
+        game_round.finished = True
+        await game_round.save()
+    elif dragon < tiger:
+        game_round.winner = "tiger"
+        game_round.finished = True
+        await game_round.save()
 
 
 @sio.event
-async def receive_bet(sid, data):
-    bet = data.get('bet')
-    await sio.emit("sdasd", data)
+async def place_bet(sid, data):
+    amount = int(data.get('amount'))
+    type = data.get('type')
+    print(type)
+    game_round = await Round.get(PydanticObjectId(data.get('game_round_id')))
+    game_player = GamePlayer(game_id=id)
+    await game_player.save()
 
+    if type == "tiger":
+        game_player.tiger_bet = amount
+        await game_player.save()
+    elif type == "dragon":
+        game_player.dragon_bet = amount
+        await game_player.save()
+    else:
+        game_player.tie_bet = amount
+        await game_player.save()
 
-@sio.event
-async def receive_target(sid, data):
-    target = data.get('target')
-    await sio.emit("sdasd", data)
+    if game_round.winner == type:
+        game_player.deposit += amount * 2
+        print("Win")
+        await game_player.save()
+    elif game_round.winner != type:
+        game_player.deposit -= amount
+        print("loose")
+        await game_player.save()
+
+    if game_round.finished:
+        print(game_round)
+        print(game_player)
+        game_round.dragon_card = None
+        game_round.tiger_card = None
+        game_round.finished = False
+        game_round.winner = None
+        await game_round.save()
 
 
 @sio.event
