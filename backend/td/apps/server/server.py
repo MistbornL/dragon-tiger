@@ -75,9 +75,8 @@ async def scan_card(sid, data):
 async def place_bet(sid, data):
     amount = int(data.get('amount'))
     type = data.get('type')
-    print(type)
     game_round = await Round.get(PydanticObjectId(data.get('game_round_id')))
-    game_player = GamePlayer(game_id=id)
+    game_player = GamePlayer(game_id=game_round.game_id)
     await game_player.save()
 
     if type == "tiger":
@@ -92,16 +91,14 @@ async def place_bet(sid, data):
 
     if game_round.winner == type:
         game_player.deposit += amount * 2
-        print("Win")
         await game_player.save()
     elif game_round.winner != type:
         game_player.deposit -= amount
-        print("loose")
         await game_player.save()
 
     if game_round.finished:
-        print(game_round)
-        print(game_player)
+        print(f"last played round:  {game_round}:")
+        print(f"player actions: {game_player}")
         game_round.dragon_card = None
         game_round.tiger_card = None
         game_round.finished = False

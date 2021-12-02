@@ -20,6 +20,7 @@ class Round(Document):
 
 
 class GamePlayer(Document):
+    game_id: str
     game_round: Optional[int]
     total_bet: int = 0
     dragon_bet: int = 0

@@ -68,3 +68,13 @@ async def get_all():
 @router.delete("/api/delete/all/round")
 async def delete_all():
     return await Round.delete_all()
+
+
+@router.get("/api/get/all/game_player")
+async def get_all():
+    return await GamePlayer.find_all().to_list()
+
+
+@router.delete("/api/delete/all/game_player")
+async def delete_all():
+    return await GamePlayer.delete_all()

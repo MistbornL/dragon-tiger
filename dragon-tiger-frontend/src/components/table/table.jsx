@@ -1,14 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import "./index.css";
-
 const Table = ({
   gameSpec,
   sendCard,
   card,
   handleChange,
-  handleChangeTarget,
-  target,
-  sendTarget,
+  handleChangeBet,
   tigerCard,
   dragonCard,
   socket,
@@ -50,17 +47,13 @@ const Table = ({
     if (renderBet) {
       return (
         <>
-          <div>
+          <div className="chips">
             <button value={1} onClick={handleClickOnBets}>
               1
             </button>
-          </div>
-          <div>
             <button value={5} onClick={handleClickOnBets}>
               5
             </button>
-          </div>
-          <div>
             <button value={10} onClick={handleClickOnBets}>
               10
             </button>
@@ -101,8 +94,8 @@ const Table = ({
             onChange={handleChange}
             value={card}
           />
-          <button>Submit</button>
-          {seconds}
+          <button onClick={sendCard}>Submit</button>
+          <h3 className="time">{seconds}</h3>
         </form>
         <div>
           <h1>{dragonCard}</h1>
