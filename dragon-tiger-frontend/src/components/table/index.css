@@ -8,7 +8,7 @@
   display: inline-block;
   border-color: rgb(143, 42, 129);
   width: 500px;
-  height: 550px;
+  height: 600px;
 }
 
 .table p {
@@ -38,4 +38,8 @@ h1,
 h2,
 h3 {
   color: rgb(145, 10, 127);
+}
+
+.scaned {
+  display: inherit;
 }

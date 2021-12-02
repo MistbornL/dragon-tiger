@@ -97,13 +97,6 @@ const Table = ({
           <button onClick={sendCard}>Submit</button>
           <h3 className="time">{seconds}</h3>
         </form>
-        <div>
-          <h1>{dragonCard}</h1>
-        </div>
-
-        <div>
-          <h1>{tigerCard}</h1>
-        </div>
         <button
           onClick={(e) => {
             setDragonOn(true);
@@ -122,6 +115,11 @@ const Table = ({
         </button>
         {renderClickedButton()}
         {renderBets()}
+        <div className="scaned">
+          <p>Dragon Card: {dragonCard}</p>
+          <p> </p>
+          <p>Tiger Card: {tigerCard}</p>
+        </div>
       </div>
     </div>
   );
