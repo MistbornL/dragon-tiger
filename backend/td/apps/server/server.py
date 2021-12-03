@@ -3,6 +3,7 @@ from urllib.parse import parse_qs
 from td.apps.documents.document import Game, Round, GamePlayer
 from beanie import PydanticObjectId
 from .quieries import get_or_create_game_round
+from .service.winer import winer
 
 sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins=[])
 s_app = socketio.ASGIApp(sio)
@@ -27,83 +28,59 @@ async def connect(sid, environ):
 
 @sio.event
 async def scan_card(sid, data):
-    print(data)
-    game_round = await Round.get(PydanticObjectId(data['game_round_id']))
+    game_round_id = data.get('game_round_id')
+    game_round = await Round.get(PydanticObjectId(game_round_id))
+    game_player = await GamePlayer.get(game_round_id)
+    print(game_player)
     card = data['card']
-    if game_round.card_count % 2 == 0:
+
+    if game_round.dragon_card == None:
         game_round.dragon_card = card
         game_round.card_count += 1
         await game_round.save()
-        await sio.emit("send_dragon_card", {"card": card}, room=game_round.game_id)
+        await sio.emit("send_dragon_card", {"card": card}, room=game_round.round_id)
     else:
         game_round.tiger_card = card
         game_round.card_count += 1
         await game_round.save()
-        await sio.emit("send_tiger_card", {"card": card}, room=game_round.game_id)
+        await sio.emit("send_tiger_card", {"card": card}, room=game_round.round_id)
 
-    dragon_card = game_round.dragon_card
-    tiger_card = game_round.tiger_card
-    dragon = ""
-    tiger = ""
-    try:
-        for dragoncard in dragon_card:
-            if dragoncard.isdigit():
-                dragon += str(dragoncard)
+    dragon = game_round.dragon_card
+    tiger = game_round.tiger_card
 
-        for tigercard in tiger_card:
-            if tigercard.isdigit():
-                tiger += str(tigercard)
+    game_round.winner = await winer(dragon, tiger, game_round)
+    await game_round.save()
+    await sio.emit('winner', {'winner': game_round.winner}, room=game_round.round_id)
+    print(game_round)
 
-        dragon = int(dragon)
-        tiger = int(tiger)
-    except TypeError:
-        print("waiting for second card")
-    except ValueError:
-        print("waiting for second card")
-
-    if dragon > tiger:
-        game_round.winner = "dragon"
-        game_round.finished = True
-        await game_round.save()
-    elif dragon < tiger:
-        game_round.winner = "tiger"
-        game_round.finished = True
-        await game_round.save()
+    # if game_round.finished == True:
+    #     if game_round.winner == game_player
 
 
 @sio.event
 async def place_bet(sid, data):
     amount = int(data.get('amount'))
     type = data.get('type')
-    game_round = await Round.get(PydanticObjectId(data.get('game_round_id')))
-    game_player = GamePlayer(game_id=game_round.game_id)
+    game_round_id = data.get('game_round_id')
+    game_round = await Round.get(PydanticObjectId(game_round_id))
+    game_player = GamePlayer(id=game_round_id)
     await game_player.save()
 
     if type == "tiger":
-        game_player.tiger_bet = amount
+        game_player.tiger_bet += amount
         await game_player.save()
     elif type == "dragon":
         game_player.dragon_bet = amount
         await game_player.save()
     else:
         game_player.tie_bet = amount
-        await game_player.save()
 
-    if game_round.winner == type:
-        game_player.deposit += amount * 2
-        await game_player.save()
-    elif game_round.winner != type:
-        game_player.deposit -= amount
-        await game_player.save()
-
-    if game_round.finished:
-        print(f"last played round:  {game_round}:")
-        print(f"player actions: {game_player}")
-        game_round.dragon_card = None
-        game_round.tiger_card = None
-        game_round.finished = False
-        game_round.winner = None
-        await game_round.save()
+    # if game_round.winner == type:
+    #     game_player.deposit += amount * 2
+    #     await game_player.save()
+    # elif game_round.winner != type:
+    #     game_player.deposit -= amount
+    #     await game_player.save()
 
 
 @sio.event
