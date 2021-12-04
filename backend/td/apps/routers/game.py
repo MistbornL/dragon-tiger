@@ -9,10 +9,7 @@ from td.apps.documents.document import Game, User, Round, GamePlayer
 from td.apps.auth.auth import authenticate_user, create_access_token, get_password_hash, get_current_user
 from td.config import settings
 from td.apps.models.models import Token
-from td.apps.server.server import sio
-import time
-from td.apps.routers.service.generate import generate_deck
-from td.apps.routers.service.shuffle import shuffle_cars
+
 
 router = APIRouter(prefix="")
 
@@ -56,7 +53,6 @@ async def delete_all():
 
 @router.post("/api/create/round", status_code=201)
 async def get_all(item: Round):
-    dragon_card, tiger_card = [], []
     return await item.save()
 
 
