@@ -11,7 +11,7 @@ class Game(Document):
 
 class Round(Document):
     end_time: int = 123123
-    round_id: str
+    game_id: str
     dragon_card: str = None
     tiger_card: str = None
     winner: str = None

@@ -3,6 +3,7 @@ from urllib.parse import parse_qs
 from td.apps.documents.document import Game, Round, GamePlayer
 from beanie import PydanticObjectId
 from .quieries import get_or_create_game_round, get_or_create_game_player
+from .service.misagebi import misagebi
 from .service.place_bets import place_bets
 from .service.winer import winer
 
@@ -31,7 +32,7 @@ async def connect(sid, environ):
 async def scan_card(sid, data):
     game_round_id = data.get('game_round_id')
     game_round = await Round.get(PydanticObjectId(game_round_id))
-    game_player = await get_or_create_game_player(game_round_id)
+    all = await GamePlayer.find_all().to_list()
 
     card = data['card']
 
@@ -39,21 +40,20 @@ async def scan_card(sid, data):
         game_round.dragon_card = card
         game_round.card_count += 1
         await game_round.save()
-        await sio.emit("send_dragon_card", {"card": card}, room=game_round.round_id)
+        await sio.emit("send_dragon_card", {"card": card}, room=game_round.game_id)
     else:
         game_round.tiger_card = card
         game_round.card_count += 1
         await game_round.save()
-        await sio.emit("send_tiger_card", {"card": card}, room=game_round.round_id)
+        await sio.emit("send_tiger_card", {"card": card}, room=game_round.game_id)
 
     game_round.winner = await winer(game_round.dragon_card, game_round.tiger_card, game_round)
     await game_round.save()
-    await sio.emit('winner', {'winner': game_round.winner}, room=game_round.round_id)
-    print(game_round)
-    print(game_player)
+    await sio.emit('winner', {'winner': game_round.winner}, room=game_round.game_id)
 
-    all_game_player = await GamePlayer.find_all(game_round_id=game_round_id).to_list()
-    print(f"all: {all_game_player}")
+    if game_round.finished:
+        print(game_round)
+        await misagebi(GamePlayer, game_round_id, game_round)
 
 
 @sio.event
@@ -64,7 +64,6 @@ async def place_bet(sid, data):
 
     game_player = await get_or_create_game_player(round_id)
     await place_bets(game_player, type, amount)
-    print(game_player)
 
 
 @sio.event
