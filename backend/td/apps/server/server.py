@@ -69,7 +69,7 @@ async def place_bet(sid, data):
 
     # creating player
     game_player = await get_or_create_game_player(round_id)
-    # place bets logic
+    # place bets logic where gameplayer round id == game_round.id
     await place_bets(game_player, type, amount)
 
 
