@@ -56,7 +56,7 @@ async def scan_card(sid, data):
 
     if game_round.finished:
         print(game_round)
-        # misagebze dayeneba
+        # misagebze dayeneba / gameplayer game_round_id == game_round.id
         await misagebi(GamePlayer, game_round_id, game_round)
 
 
@@ -69,7 +69,7 @@ async def place_bet(sid, data):
 
     # creating player
     game_player = await get_or_create_game_player(round_id)
-    # place bets logic where gameplayer round id == game_round.id
+    # place bets logic
     await place_bets(game_player, type, amount)
 
 
